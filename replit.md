@@ -23,6 +23,8 @@ This is a comprehensive cannabis cultivation management application built with R
 - **Routing**: React Router DOM 7.9.1
 - **Charts**: Chart.js 4.4.3, Recharts 3.2.1
 - **AI Integration**: Google Gemini AI (@google/genai 1.20.0)
+- **Database**: Supabase (PostgreSQL) with Row Level Security
+- **Authentication**: bcryptjs for secure password hashing
 - **Styling**: Tailwind CSS (CDN - development only)
 
 ## Project Structure
@@ -39,7 +41,9 @@ This is a comprehensive cannabis cultivation management application built with R
 ├── context/             # React context providers
 ├── hooks/               # Custom React hooks
 ├── services/            # API and service integrations
-│   ├── geminiService.ts # Gemini AI service
+│   ├── geminiService.ts    # Gemini AI service
+│   ├── supabaseClient.ts   # Supabase database client
+│   ├── authService.ts      # Authentication service with bcrypt
 │   └── nutritionService.ts
 ├── functions/           # Netlify-style serverless functions (not used in Replit)
 ├── App.tsx             # Main app component with routing
@@ -55,6 +59,8 @@ This is a comprehensive cannabis cultivation management application built with R
 - `GEMINI_API_KEY`: Google Gemini API key for AI features
   - Get your API key at: https://aistudio.google.com/apikey
   - Used for plant diagnosis and harvest predictions
+- `SUPABASE_URL`: Supabase project URL
+- `SUPABASE_ANON_KEY`: Supabase anonymous key for client authentication
 
 ### Development Server
 - **Port**: 5000
@@ -84,19 +90,34 @@ npm run preview
 ### vite.config.ts
 - Configured to use port 5000 (Replit's standard port)
 - HMR settings optimized for Replit's proxy
-- Environment variables exposed to the app via `define`
+- Environment variables exposed to the app via `define` (GEMINI_API_KEY, SUPABASE_URL, SUPABASE_ANON_KEY)
+- Configured `allowedHosts: true` for EasyPanel Docker deployment
+
+### Dockerfile
+- Multi-stage build for optimized production image
+- Uses `serve` package to serve production build
+- Port 5000 exposed for consistency
+- Optimized for EasyPanel deployment
 
 ### Deployment
-- **Type**: Autoscale (stateless web app)
+- **Type**: Docker on EasyPanel
 - **Build**: `npm run build`
-- **Run**: Vite preview server on port 5000
+- **Run**: `serve -s dist -l 5000`
 
 ## Recent Changes
+- **2025-10-05**: Supabase Database Integration (COMPLETED ✅)
+  - Migrated from localStorage to Supabase PostgreSQL
+  - Implemented secure authentication with bcrypt password hashing
+  - Created complete database schema with 20 tables and UUID foreign keys
+  - Added Row Level Security (RLS) policies for multi-tenant data isolation
+  - Created comprehensive MIGRATION_GUIDE.md for data migration
+  - Configured Docker deployment for EasyPanel with `serve`
+  - Updated Vite config with Supabase environment variables and allowedHosts
+
 - **2025-10-05**: Initial Replit setup
   - Updated Vite config for Replit environment (port 5000, HMR proxy settings)
   - Fixed JSX syntax errors in Infographics.tsx (HTML entity escaping)
   - Created missing index.css file
-  - Configured deployment for Replit Autoscale
   - Added .gitignore for Node.js/Vite projects
 
 ## User Preferences
@@ -104,13 +125,40 @@ npm run preview
 - Application domain: Cannabis cultivation management
 
 ## Data Management
-This application uses local storage for data persistence. No external database is configured. User data including:
-- Cultivation batches
-- Environmental logs
-- Task schedules
-- Settings and preferences
 
-Are stored in the browser's localStorage.
+### Supabase Database (Production)
+The application uses **Supabase PostgreSQL** for persistent data storage with the following architecture:
+
+**Database Schema (20 tables):**
+1. `users` - User accounts with bcrypt-hashed passwords
+2. `genetics` - Cannabis strain genetics
+3. `locations` - Growing locations and rooms
+4. `mother_plants` - Mother plant inventory
+5. `plant_batches` - Plant batch tracking
+6. `crops` - Active cultivation crops
+7. `crop_plant_counts` - Plant count tracking per crop
+8. `log_entries` - Environmental and cultivation logs
+9. `formulas` - Nutrient formulas
+10. `formula_schedules` - Formula application schedules
+11. `inventory_items` - Inventory management
+12. `equipment` - Equipment tracking
+13. `tasks` - Task management
+14. `maintenance_logs` - Equipment maintenance records
+15. `expenses` - Financial expense tracking
+16. `trimming_sessions` - Trimming session records
+17. `notifications` - User notifications
+18. `announcements` - System announcements
+19. `pno_procedures` - Standard operating procedures
+20. `infographics` - Educational infographics
+
+**Key Features:**
+- UUID primary and foreign keys for all relationships
+- Row Level Security (RLS) for multi-tenant data isolation
+- Fail-fast client initialization (throws error if credentials missing)
+- Secure authentication with bcrypt password hashing (rounds: 10)
+
+**Migration Guide:**
+See `MIGRATION_GUIDE.md` for complete data migration instructions from localStorage to Supabase, including dependency-safe table ordering to prevent FK violations.
 
 ## AI Features
 The app integrates with Google's Gemini AI for:
@@ -127,7 +175,15 @@ The app integrates with Google's Gemini AI for:
    - Returns yield range, reasoning, and confidence level
 
 ## Notes
-- The app was originally designed for Netlify but has been adapted for Replit
+- The app was originally designed for Netlify but has been adapted for Replit and EasyPanel deployment
 - Tailwind CSS is loaded via CDN (development only - should be installed for production)
 - The app uses HashRouter for client-side routing
-- Authentication is handled via local context (no external auth service)
+- Authentication uses bcrypt for secure password hashing
+- Database migration must follow the order specified in MIGRATION_GUIDE.md to avoid FK violations
+
+## Important Files
+- `database-schema.sql` - Complete Supabase database schema
+- `MIGRATION_GUIDE.md` - Step-by-step data migration guide
+- `Dockerfile` - Production Docker configuration for EasyPanel
+- `services/supabaseClient.ts` - Supabase client with fail-fast initialization
+- `services/authService.ts` - Authentication service with bcrypt
