@@ -198,7 +198,7 @@ const EliteGrowInfographic: React.FC = () => {
         <>
             <header className="bg-[#003f5c] text-white p-8 text-center relative">
                 <h1 className="text-4xl font-bold">PNO de Cultivo de Élite V4.7</h1>
-                <p className="mt-2 text-lg text-slate-300">Hoja de Ruta Visual para Rendimientos >1,000 g/m²</p>
+                <p className="mt-2 text-lg text-slate-300">Hoja de Ruta Visual para Rendimientos {'>'} 1,000 g/m²</p>
                 {elitePno && (
                     <button
                         onClick={() => navigate('/pno-library', { state: { openPnoId: elitePno.id } })}
@@ -210,7 +210,7 @@ const EliteGrowInfographic: React.FC = () => {
             </header>
             <main className="p-4 md:p-8">
                 <section id="kpis" className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 text-center mb-12">
-                    <div className="bg-white p-6 rounded-lg shadow-md"><h3 className="text-xl font-semibold text-[#7a5195]">Rendimiento Objetivo</h3><p className="text-5xl font-bold text-[#003f5c] mt-2">>1,000 g/m²</p><p className="text-slate-500 mt-1">Con LEDs de alta eficiencia</p></div>
+                    <div className="bg-white p-6 rounded-lg shadow-md"><h3 className="text-xl font-semibold text-[#7a5195]">Rendimiento Objetivo</h3><p className="text-5xl font-bold text-[#003f5c] mt-2">{'>'} 1,000 g/m²</p><p className="text-slate-500 mt-1">Con LEDs de alta eficiencia</p></div>
                     <div className="bg-white p-6 rounded-lg shadow-md"><h3 className="text-xl font-semibold text-[#7a5195]">CO₂ Máximo</h3><p className="text-5xl font-bold text-[#003f5c] mt-2">1400 ppm</p><p className="text-slate-500 mt-1">En pico de floración</p></div>
                     <div className="bg-white p-6 rounded-lg shadow-md"><h3 className="text-xl font-semibold text-[#7a5195]">PPFD Máximo</h3><p className="text-5xl font-bold text-[#003f5c] mt-2">1300 µmol·m⁻²·s⁻¹</p><p className="text-slate-500 mt-1">Para máxima fotosíntesis</p></div>
                 </section>
@@ -302,7 +302,7 @@ const MotherPlantsInfographic: React.FC = () => {
                 <section id="kpis" className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 text-center mb-12">
                     <div className="bg-white p-6 rounded-lg shadow-md transform hover:scale-105 transition-transform duration-300"><h3 className="text-xl font-semibold text-[#7a5195]">Salud Genética</h3><p className="text-5xl font-bold text-[#003f5c] mt-2">100%</p><p className="text-slate-500 mt-1">Preservación a largo plazo</p></div>
                     <div className="bg-white p-6 rounded-lg shadow-md transform hover:scale-105 transition-transform duration-300"><h3 className="text-xl font-semibold text-[#7a5195]">Vigor Constante</h3><p className="text-5xl font-bold text-[#003f5c] mt-2">ÓPTIMO</p><p className="text-slate-500 mt-1">Plantas sanas, sin estrés</p></div>
-                    <div className="bg-white p-6 rounded-lg shadow-md transform hover:scale-105 transition-transform duration-300"><h3 className="text-xl font-semibold text-[#7a5195]">Producción de Esquejes</h3><p className="text-5xl font-bold text-[#003f5c] mt-2">>95%</p><p className="text-slate-500 mt-1">Calidad y tasa de éxito</p></div>
+                    <div className="bg-white p-6 rounded-lg shadow-md transform hover:scale-105 transition-transform duration-300"><h3 className="text-xl font-semibold text-[#7a5195]">Producción de Esquejes</h3><p className="text-5xl font-bold text-[#003f5c] mt-2">{'>'} 95%</p><p className="text-slate-500 mt-1">Calidad y tasa de éxito</p></div>
                 </section>
                 <section id="ambiente" className="bg-white p-6 rounded-lg shadow-md max-w-6xl mx-auto mb-12">
                     <h2 className="text-3xl font-bold text-center text-[#003f5c] mb-2">Ambiente de Mantenimiento Perpetuo</h2>
