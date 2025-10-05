@@ -14,6 +14,12 @@ export default defineConfig(({ mode }) => {
           host: process.env.REPLIT_DEV_DOMAIN || 'localhost'
         }
       },
+      preview: {
+        port: 5000,
+        host: '0.0.0.0',
+        strictPort: true,
+        allowedHosts: true
+      },
       plugins: [react()],
       define: {
         'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
