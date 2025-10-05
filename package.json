@@ -9,13 +9,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@google/genai": "^1.20.0",
+    "@netlify/functions": "^4.2.6",
+    "@types/bcryptjs": "^2.4.6",
+    "bcryptjs": "^3.0.2",
+    "chart.js": "4.4.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "recharts": "^3.2.1",
-    "@google/genai": "^1.20.0",
     "react-router-dom": "^7.9.1",
-    "chart.js": "4.4.3",
-    "@netlify/functions": "^4.2.6"
+    "recharts": "^3.2.1"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS users (
   username TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
   roles TEXT[] NOT NULL DEFAULT '{}',
-  location_id TEXT,
-  maintenance_location_ids TEXT[] DEFAULT '{}',
+  location_id UUID REFERENCES locations(id) ON DELETE SET NULL,
+  maintenance_location_ids UUID[] DEFAULT '{}',
   permissions JSONB DEFAULT '{}',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS plant_batches (
   initial_plant_count INTEGER NOT NULL,
   rooted_plant_count INTEGER,
   available_plant_count INTEGER NOT NULL,
-  source_location_id TEXT NOT NULL,
+  source_location_id UUID REFERENCES locations(id) ON DELETE SET NULL,
   type TEXT NOT NULL, -- 'seed' or 'clone'
   status TEXT NOT NULL, -- PlantBatchStatus enum values
   creator_id UUID REFERENCES users(id) ON DELETE SET NULL,

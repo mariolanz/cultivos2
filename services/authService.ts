@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient';
-import { User, UserRole, AppPermission } from '../types';
+import { UserRole, AppPermission } from '../types';
+import bcrypt from 'bcryptjs';
 
 export interface AuthUser {
   id: string;
@@ -16,28 +17,32 @@ export interface AuthUser {
 export const login = async (username: string, password: string): Promise<AuthUser | null> => {
   try {
     // Query user by username
-    const { data: users, error } = await supabase
+    const { data: user, error } = await supabase
       .from('users')
       .select('*')
       .eq('username', username)
       .single();
 
-    if (error || !users) {
+    if (error || !user) {
       console.error('User not found:', error);
       return null;
     }
 
-    // In production, you should verify password hash here
-    // For now, we'll use Supabase Auth or implement bcrypt
-    // This is a simplified version - you should use proper password hashing
+    // Verify password using bcrypt
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+    
+    if (!isPasswordValid) {
+      console.error('Invalid password');
+      return null;
+    }
 
     const authUser: AuthUser = {
-      id: users.id,
-      username: users.username,
-      roles: users.roles || [],
-      locationId: users.location_id,
-      maintenanceLocationIds: users.maintenance_location_ids || [],
-      permissions: users.permissions || {}
+      id: user.id,
+      username: user.username,
+      roles: user.roles || [],
+      locationId: user.location_id,
+      maintenanceLocationIds: user.maintenance_location_ids || [],
+      permissions: user.permissions || {}
     };
 
     return authUser;
@@ -59,12 +64,14 @@ export const createUser = async (userData: {
   permissions: { [key in AppPermission]?: boolean };
 }): Promise<AuthUser | null> => {
   try {
-    // In production, hash the password before storing
+    // Hash password before storing
+    const passwordHash = await bcrypt.hash(userData.password, 10);
+    
     const { data, error } = await supabase
       .from('users')
       .insert({
         username: userData.username,
-        password_hash: userData.password, // Should be hashed!
+        password_hash: passwordHash,
         roles: userData.roles,
         location_id: userData.locationId,
         maintenance_location_ids: userData.maintenanceLocationIds,
