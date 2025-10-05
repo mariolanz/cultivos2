@@ -4,20 +4,11 @@
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Users table
-CREATE TABLE IF NOT EXISTS users (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  username TEXT UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL,
-  roles TEXT[] NOT NULL DEFAULT '{}',
-  location_id UUID REFERENCES locations(id) ON DELETE SET NULL,
-  maintenance_location_ids UUID[] DEFAULT '{}',
-  permissions JSONB DEFAULT '{}',
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+-- ============================================
+-- TABLES WITHOUT DEPENDENCIES (create first)
+-- ============================================
 
--- Genetics table
+-- Genetics table (no dependencies)
 CREATE TABLE IF NOT EXISTS genetics (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL,
@@ -31,7 +22,7 @@ CREATE TABLE IF NOT EXISTS genetics (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Locations table
+-- Locations table (self-referencing only)
 CREATE TABLE IF NOT EXISTS locations (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL,
@@ -41,7 +32,43 @@ CREATE TABLE IF NOT EXISTS locations (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Mother Plants table
+-- ============================================
+-- TABLES DEPENDENT ON LOCATIONS
+-- ============================================
+
+-- Users table (depends on locations)
+CREATE TABLE IF NOT EXISTS users (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  username TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  roles TEXT[] NOT NULL DEFAULT '{}',
+  location_id UUID REFERENCES locations(id) ON DELETE SET NULL,
+  maintenance_location_ids UUID[] DEFAULT '{}',
+  permissions JSONB DEFAULT '{}',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Equipment table (depends on locations)
+CREATE TABLE IF NOT EXISTS equipment (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL,
+  type TEXT NOT NULL,
+  location_id UUID REFERENCES locations(id) ON DELETE SET NULL,
+  installation_date DATE,
+  warranty_expiry_date DATE,
+  maintenance_interval_days INTEGER,
+  last_maintenance_date DATE,
+  notes TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- ============================================
+-- TABLES DEPENDENT ON GENETICS AND LOCATIONS
+-- ============================================
+
+-- Mother Plants table (depends on genetics, locations)
 CREATE TABLE IF NOT EXISTS mother_plants (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL,
@@ -54,25 +81,7 @@ CREATE TABLE IF NOT EXISTS mother_plants (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Plant Batches table
-CREATE TABLE IF NOT EXISTS plant_batches (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name TEXT NOT NULL,
-  genetics_id UUID REFERENCES genetics(id) ON DELETE CASCADE,
-  creation_date DATE NOT NULL,
-  initial_plant_count INTEGER NOT NULL,
-  rooted_plant_count INTEGER,
-  available_plant_count INTEGER NOT NULL,
-  source_location_id UUID REFERENCES locations(id) ON DELETE SET NULL,
-  type TEXT NOT NULL, -- 'seed' or 'clone'
-  status TEXT NOT NULL, -- PlantBatchStatus enum values
-  creator_id UUID REFERENCES users(id) ON DELETE SET NULL,
-  mother_plant_id UUID REFERENCES mother_plants(id) ON DELETE SET NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Crops table
+-- Crops table (depends on genetics, locations, users)
 CREATE TABLE IF NOT EXISTS crops (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   genetics_id UUID REFERENCES genetics(id) ON DELETE CASCADE,
@@ -88,6 +97,28 @@ CREATE TABLE IF NOT EXISTS crops (
   light_hours_flower INTEGER DEFAULT 12,
   is_archived BOOLEAN DEFAULT FALSE,
   harvest_data JSONB,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- ============================================
+-- TABLES DEPENDENT ON MULTIPLE ENTITIES
+-- ============================================
+
+-- Plant Batches table (depends on genetics, locations, users, mother_plants)
+CREATE TABLE IF NOT EXISTS plant_batches (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL,
+  genetics_id UUID REFERENCES genetics(id) ON DELETE CASCADE,
+  creation_date DATE NOT NULL,
+  initial_plant_count INTEGER NOT NULL,
+  rooted_plant_count INTEGER,
+  available_plant_count INTEGER NOT NULL,
+  source_location_id UUID REFERENCES locations(id) ON DELETE SET NULL,
+  type TEXT NOT NULL, -- 'seed' or 'clone'
+  status TEXT NOT NULL, -- PlantBatchStatus enum values
+  creator_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  mother_plant_id UUID REFERENCES mother_plants(id) ON DELETE SET NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -122,6 +153,10 @@ CREATE TABLE IF NOT EXISTS log_entries (
     (mother_plant_id IS NOT NULL)::INTEGER = 1
   )
 );
+
+-- ============================================
+-- STANDALONE TABLES (no foreign keys)
+-- ============================================
 
 -- Formulas table
 CREATE TABLE IF NOT EXISTS formulas (
@@ -159,22 +194,22 @@ CREATE TABLE IF NOT EXISTS inventory_items (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Equipment table
-CREATE TABLE IF NOT EXISTS equipment (
+-- Infographics table
+CREATE TABLE IF NOT EXISTS infographics (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name TEXT NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT,
   type TEXT NOT NULL,
-  location_id UUID REFERENCES locations(id) ON DELETE SET NULL,
-  installation_date DATE,
-  warranty_expiry_date DATE,
-  maintenance_interval_days INTEGER,
-  last_maintenance_date DATE,
-  notes TEXT,
+  data JSONB,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Tasks table
+-- ============================================
+-- TASK AND MAINTENANCE TABLES
+-- ============================================
+
+-- Tasks table (depends on users, crops, equipment)
 CREATE TABLE IF NOT EXISTS tasks (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   title TEXT NOT NULL,
@@ -192,7 +227,7 @@ CREATE TABLE IF NOT EXISTS tasks (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Maintenance Logs table
+-- Maintenance Logs table (depends on tasks, equipment, users)
 CREATE TABLE IF NOT EXISTS maintenance_logs (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   task_id UUID REFERENCES tasks(id) ON DELETE SET NULL,
@@ -205,7 +240,11 @@ CREATE TABLE IF NOT EXISTS maintenance_logs (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Expenses table
+-- ============================================
+-- FINANCIAL AND OPERATIONAL TABLES
+-- ============================================
+
+-- Expenses table (depends on locations, crops, users)
 CREATE TABLE IF NOT EXISTS expenses (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   date DATE NOT NULL,
@@ -219,7 +258,7 @@ CREATE TABLE IF NOT EXISTS expenses (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Trimming Sessions table
+-- Trimming Sessions table (depends on crops, users)
 CREATE TABLE IF NOT EXISTS trimming_sessions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   crop_id UUID REFERENCES crops(id) ON DELETE CASCADE,
@@ -231,7 +270,11 @@ CREATE TABLE IF NOT EXISTS trimming_sessions (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Notifications table
+-- ============================================
+-- COMMUNICATION TABLES
+-- ============================================
+
+-- Notifications table (depends on users)
 CREATE TABLE IF NOT EXISTS notifications (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
@@ -241,7 +284,7 @@ CREATE TABLE IF NOT EXISTS notifications (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Announcements table
+-- Announcements table (depends on locations, users)
 CREATE TABLE IF NOT EXISTS announcements (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   message TEXT NOT NULL,
@@ -251,7 +294,7 @@ CREATE TABLE IF NOT EXISTS announcements (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- PNO Procedures table
+-- PNO Procedures table (depends on users)
 CREATE TABLE IF NOT EXISTS pno_procedures (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   title TEXT NOT NULL,
@@ -265,18 +308,10 @@ CREATE TABLE IF NOT EXISTS pno_procedures (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Infographics table
-CREATE TABLE IF NOT EXISTS infographics (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  title TEXT NOT NULL,
-  description TEXT,
-  type TEXT NOT NULL,
-  data JSONB,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+-- ============================================
+-- INDEXES FOR PERFORMANCE
+-- ============================================
 
--- Create indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_crops_owner ON crops(owner_id);
 CREATE INDEX IF NOT EXISTS idx_crops_genetics ON crops(genetics_id);
 CREATE INDEX IF NOT EXISTS idx_crops_location ON crops(location_id);
@@ -290,7 +325,10 @@ CREATE INDEX IF NOT EXISTS idx_tasks_crop ON tasks(crop_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_read ON notifications(is_read);
 
--- Enable Row Level Security (RLS)
+-- ============================================
+-- ROW LEVEL SECURITY (RLS)
+-- ============================================
+
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE crops ENABLE ROW LEVEL SECURITY;
 ALTER TABLE plant_batches ENABLE ROW LEVEL SECURITY;
@@ -299,7 +337,10 @@ ALTER TABLE log_entries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 
--- RLS Policies (basic examples - adjust based on your needs)
+-- ============================================
+-- RLS POLICIES
+-- ============================================
+
 -- Users can read their own data
 CREATE POLICY "Users can view own data" ON users
   FOR SELECT USING (auth.uid() = id);
