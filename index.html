@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Torus Ac. - Gestión de Cultivo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'background': '#fdfcf9',
+              'surface': '#ffffff',
+              'text-primary': '#2d332a',
+              'text-secondary': '#5c615a',
+              'primary': '#8A9A85',
+              'primary-dark': '#748770',
+              'accent': '#B18A5A',
+              'muted': '#BDB6A8',
+              'border-color': '#e5e7eb',
+            }
+          }
+        }
+      }
+    </script>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "recharts": "https://aistudiocdn.com/recharts@^3.2.1",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.20.0",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.1",
+    "chart.js": "https://cdn.jsdelivr.net/npm/chart.js@4.4.3/+esm",
+    "@netlify/functions": "https://aistudiocdn.com/@netlify/functions@^4.2.6"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-background text-text-primary">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+</body>
+</html>

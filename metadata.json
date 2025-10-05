@@ -1,0 +1,7 @@
+{
+  "name": "Copy of Torus Ac. - Gestión de Cultivo de CannabisV2",
+  "description": "Una aplicación web integrada para cultivadores de cannabis para registrar, monitorear y optimizar sus ciclos de cultivo. Las características incluyen seguimiento de cultivos, entradas de registro, diagnóstico de plantas impulsado por IA, gestión de inventario y reportes de datos.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
