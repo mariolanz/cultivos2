@@ -18,7 +18,11 @@ export default defineConfig(({ mode }) => {
         port: 5000,
         host: '0.0.0.0',
         strictPort: true,
-        allowedHosts: ['.easypanel.host']
+        allowedHosts: [
+          'localhost',
+          '.nxfws2.easypanel.host',
+          'operacion-t2.nxfws2.easypanel.host'
+        ]
       },
       plugins: [react()],
       define: {
