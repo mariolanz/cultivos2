@@ -105,6 +105,22 @@ npm run preview
 - **Run**: `serve -s dist -l 5000`
 
 ## Recent Changes
+- **2025-10-05**: Data Migration to Supabase (COMPLETED ✅)
+  - Successfully migrated all example data from constants.ts to Supabase
+  - **Migrated data:**
+    - 30 cannabis genetics strains
+    - 24 locations (4 sites + 20 rooms)
+    - 13 users with bcrypt-hashed passwords (LUIS B, LUMZA, FERMIN, etc.)
+    - 30 mother plants
+    - 13 active crops
+    - 8 plant batches
+    - 11 nutrient formulas with schedule
+    - 106 inventory items
+    - 22 maintenance/cultivation tasks
+    - 3 PNO procedures
+    - 2 infographics
+  - All users ready for login with original passwords (e.g., LUIS B / LUBBana420)
+
 - **2025-10-05**: Supabase Database Integration (COMPLETED ✅)
   - Migrated from localStorage to Supabase PostgreSQL
   - Implemented secure authentication with bcrypt password hashing
