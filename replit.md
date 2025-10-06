@@ -109,6 +109,21 @@ npm run preview
 - **Run**: `serve -s dist -l 5000`
 
 ## Recent Changes
+- **2025-10-06**: Refactorización del Sistema de Autenticación y Base de Datos (EN PROGRESO)
+  - **Problema resuelto**: Eliminadas dependencias circulares entre usuarios y otras tablas
+  - **Nuevo flujo de inicio**: Solo usuario ADMIN por defecto (usuario: ADMIN, password: admin123)
+  - **AppProvider optimizado**: 
+    - Primera carga: solo usuarios (necesario para login)
+    - Post-login: carga todos los datos del sistema
+  - **Location por defecto**: Se crea "Central" automáticamente si no existe
+  - **RLS actualizado**: Solo usuarios autenticados pueden acceder a datos
+  - **Scripts SQL nuevos**:
+    - `init-admin-only.sql`: Inicializa solo admin + location Central
+    - `update-rls-authenticated.sql`: RLS para usuarios autenticados
+    - `remove-public-rls.sql`: Elimina acceso público a locations/genetics
+  - **Admin total**: ADMIN tiene acceso completo sin depender de locations/genetics preexistentes
+
+## Recent Changes (Historical)
 - **2025-10-06**: Fixed Environment Variables for Production Deploy (COMPLETED ✅)
   - Migrated from `process.env` to `import.meta.env` (Vite standard for client-side)
   - Created `src/vite-env.d.ts` for TypeScript support

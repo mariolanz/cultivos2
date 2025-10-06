@@ -334,10 +334,34 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [infographics, setInfographics] = useState<Infographic[]>([]);
 
   useEffect(() => {
-    async function loadData() {
+    async function loadInitialData() {
       try {
         setIsLoading(true);
-        console.log('🔄 Iniciando carga de datos desde Supabase...');
+        console.log('🔄 Cargando usuarios para login...');
+        
+        const usersData = await authService.getAllUsers().catch(e => { 
+          console.error('❌ Error cargando users:', e); 
+          return []; 
+        });
+        
+        setUsers(usersData as User[]);
+        console.log('✅ Usuarios cargados');
+      } catch (error) {
+        console.error('❌ Error loading initial data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadInitialData();
+  }, []);
+
+  useEffect(() => {
+    async function loadUserData() {
+      if (!loggedInUser) return;
+      
+      try {
+        console.log('🔄 Usuario autenticado, cargando datos del sistema...');
         
         const [
           geneticsData,
@@ -349,7 +373,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           expensesData,
           pnoData,
           infographicsData,
-          usersData,
           motherPlantsData,
           cropsData,
           batchesData,
@@ -367,7 +390,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           expensesService.getAll().catch(e => { console.error('❌ Error cargando expenses:', e); return []; }),
           pnoProceduresService.getAll().catch(e => { console.error('❌ Error cargando PNO:', e); return []; }),
           infographicsService.getAll().catch(e => { console.error('❌ Error cargando infographics:', e); return []; }),
-          authService.getAllUsers().catch(e => { console.error('❌ Error cargando users:', e); return []; }),
           motherPlantsService.getAll().catch(e => { console.error('❌ Error cargando mother plants:', e); return []; }),
           cropsService.getAll().catch(e => { console.error('❌ Error cargando crops:', e); return []; }),
           plantBatchesService.getAll().catch(e => { console.error('❌ Error cargando batches:', e); return []; }),
@@ -386,7 +408,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setExpenses(expensesData as Expense[]);
         setPnoProcedures(pnoData as PnoProcedure[]);
         setInfographics(infographicsData as Infographic[]);
-        setUsers(usersData as User[]);
         setMotherPlants(motherPlantsData as MotherPlant[]);
         setAllCrops(cropsData as Crop[]);
         setPlantBatches(batchesData as PlantBatch[]);
@@ -395,16 +416,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setNotifications(notificationsData as Notification[]);
         setAnnouncements(announcementsData as Announcement[]);
         
-        console.log('✅ Carga de datos completada');
+        console.log('✅ Datos del sistema cargados');
       } catch (error) {
-        console.error('❌ Error general loading data from Supabase:', error);
-      } finally {
-        setIsLoading(false);
+        console.error('❌ Error loading user data:', error);
       }
     }
 
-    loadData();
-  }, []);
+    loadUserData();
+  }, [loggedInUser]);
 
   const currentUser = useMemo(() => {
     if (simulatedUserId) {
