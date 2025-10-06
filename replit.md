@@ -105,6 +105,14 @@ npm run preview
 - **Run**: `serve -s dist -l 5000`
 
 ## Recent Changes
+- **2025-10-06**: Fixed Environment Variables for Production Deploy (COMPLETED ✅)
+  - Migrated from `process.env` to `import.meta.env` (Vite standard for client-side)
+  - Created `src/vite-env.d.ts` for TypeScript support
+  - Simplified `vite.config.ts` - removed custom `define` (Vite handles VITE_* automatically)
+  - Created `.env` file mapping Replit Secrets to VITE_* prefix
+  - Removed debug console.logs from supabaseClient.ts
+  - **IMPORTANT for EasyPanel**: Environment variables MUST have `VITE_` prefix
+
 - **2025-10-06**: Frontend Integration with Supabase (COMPLETED ✅)
   - Creado `services/dataService.ts` con operaciones CRUD completas para todas las entidades
   - AppProvider ahora carga datos de Supabase al inicio de la sesión
