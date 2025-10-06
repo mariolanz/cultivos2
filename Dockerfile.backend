@@ -1,0 +1,21 @@
+# Backend API Dockerfile
+FROM node:20-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci --only=production
+
+# Copy only necessary files for backend
+COPY api/ ./api/
+COPY services/supabaseClient.ts ./services/supabaseClient.ts
+
+# Expose backend port
+EXPOSE 3001
+
+# Start backend API server
+CMD ["npm", "run", "api"]

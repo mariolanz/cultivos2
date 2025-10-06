@@ -93,20 +93,40 @@ npm run preview
 - Environment variables exposed to the app via `define` (GEMINI_API_KEY, SUPABASE_URL, SUPABASE_ANON_KEY)
 - Configured `allowedHosts: true` for EasyPanel Docker deployment
 
-### Dockerfile
-- Multi-stage build for optimized production image
-- Uses `serve` package to serve production build
-- Port 5000 exposed for consistency
-- Accepts build arguments (ARG) for Vite environment variables:
-  - VITE_SUPABASE_URL
-  - VITE_SUPABASE_ANON_KEY
-  - VITE_GEMINI_API_KEY
-- Optimized for EasyPanel deployment
+### Dockerfiles
+La aplicación usa **dos Dockerfiles separados** para deployment:
 
-### Deployment
-- **Type**: Docker on EasyPanel
-- **Build**: `npm run build`
-- **Run**: `serve -s dist -l 5000`
+**Dockerfile.frontend** (Frontend - Puerto 5000):
+- Multi-stage build para optimizar imagen
+- Usa `serve` para servir build de producción
+- Build arguments para variables Vite (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_GEMINI_API_KEY)
+- Comando: `serve -s dist -l 5000`
+
+**Dockerfile.backend** (Backend API - Puerto 3001):
+- Imagen ligera con dependencias de producción
+- Copia solo archivos necesarios (api/, services/supabaseClient.ts)
+- Comando: `npm run api`
+
+### Deployment en EasyPanel
+**Arquitectura de 2 Servicios desde el MISMO repositorio:**
+
+**Servicio 1: Frontend**
+- Repository: Mismo repo de GitHub
+- Dockerfile: `Dockerfile.frontend`
+- Variables de entorno:
+  - `VITE_SUPABASE_URL`
+  - `VITE_SUPABASE_ANON_KEY`
+  - `VITE_GEMINI_API_KEY`
+  - `VITE_API_URL` (URL del backend, ej: https://api.tudominio.com)
+- Puerto: 5000
+
+**Servicio 2: Backend API**
+- Repository: Mismo repo de GitHub
+- Dockerfile: `Dockerfile.backend`
+- Variables de entorno:
+  - `VITE_SUPABASE_URL` (o `SUPABASE_URL`)
+  - `SUPABASE_SERVICE_ROLE_KEY` ⚠️ **Solo en backend**
+- Puerto: 3001
 
 ## Recent Changes
 - **2025-10-06**: Refactorización del Sistema de Autenticación y Base de Datos (COMPLETADO ✅)
