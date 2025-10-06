@@ -4,6 +4,7 @@ import { User, Crop, PlantBatch, Location, InventoryItem, Formula, FormulaSchedu
 import * as D from '../constants';
 import { getStageInfo, getFormulaForWeek, getParentLocationId, getPnoParametersForWeek, isOutOfRange } from '../services/nutritionService';
 import * as authService from '../services/authService';
+import { apiService } from '../services/apiService';
 import {
   geneticsService,
   locationsService,
@@ -487,7 +488,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     maintenanceLocationIds?: string[];
     permissions: { [key in AppPermission]?: boolean };
   }): Promise<User | null> => {
-    const newUser = await authService.createUser(userData);
+    if (!loggedInUser?.id) {
+      console.error('No logged in user');
+      return null;
+    }
+    const newUser = await apiService.createUser(userData, loggedInUser.id);
     if (newUser) {
       setUsers(prev => [...prev, newUser]);
       return newUser;
@@ -495,43 +500,53 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return null;
   };
 
-  const deleteUser = (userId: string) => {
+  const deleteUser = async (userId: string) => {
     if (loggedInUser?.id === userId) {
       alert("No puedes eliminarte a ti mismo.");
+      return;
+    }
+    if (!loggedInUser?.id) {
+      console.error('No logged in user');
       return;
     }
     if (simulatedUserId === userId) {
       setSimulatedUserId(null);
       setActiveRole(null);
     }
-    authService.deleteUser(userId).then(success => {
-      if (success) {
-        setUsers(prev => prev.filter(u => u.id !== userId));
-      }
-    });
+    const success = await apiService.deleteUser(userId, loggedInUser.id);
+    if (success) {
+      setUsers(prev => prev.filter(u => u.id !== userId));
+    }
   };
 
   const saveUser = async (user: User): Promise<boolean> => {
-    const success = await authService.updateUser(user.id, {
-      id: user.id,
+    if (!loggedInUser?.id) {
+      console.error('No logged in user');
+      return false;
+    }
+    
+    const updatedUser = await apiService.updateUser(user.id, {
       username: user.username,
+      password: user.password,
       roles: user.roles,
       locationId: user.locationId,
       maintenanceLocationIds: user.maintenanceLocationIds,
       permissions: user.permissions
-    });
-    if (success) {
+    }, loggedInUser.id);
+    
+    if (updatedUser) {
       setUsers(prev => {
         const index = prev.findIndex(u => u.id === user.id);
         if (index > -1) {
           const newUsers = [...prev];
-          newUsers[index] = user;
+          newUsers[index] = updatedUser;
           return newUsers;
         }
-        return [...prev, user];
+        return [...prev, updatedUser];
       });
+      return true;
     }
-    return success;
+    return false;
   };
 
   const createSaveFunction = <T extends { id: string }>(
