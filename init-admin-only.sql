@@ -59,10 +59,11 @@ VALUES (
 );
 
 -- Crear location central por defecto
-INSERT INTO locations (id, name) 
+INSERT INTO locations (id, name, type) 
 VALUES (
-  'loc-central',
-  'Central'
+  'cccccccc-cccc-cccc-cccc-cccccccccccc',
+  'Central',
+  'site'
 );
 
 COMMIT;
