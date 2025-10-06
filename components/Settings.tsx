@@ -75,7 +75,7 @@ const UserManagement: React.FC = () => {
         setForm(initialFormState);
     };
 
-    const handleSaveUser = (e: React.FormEvent) => {
+    const handleSaveUser = async (e: React.FormEvent) => {
         e.preventDefault();
         
         if (isCreatingUser) {
@@ -83,7 +83,7 @@ const UserManagement: React.FC = () => {
                 alert('Usuario y contraseña son obligatorios');
                 return;
             }
-            createUser({
+            const newUser = await createUser({
                 username: form.username,
                 password: form.password,
                 roles: form.roles,
@@ -91,6 +91,13 @@ const UserManagement: React.FC = () => {
                 maintenanceLocationIds: form.maintenanceLocationIds.length > 0 ? form.maintenanceLocationIds : undefined,
                 permissions: form.permissions,
             });
+            
+            if (newUser) {
+                alert(`Usuario ${form.username} creado exitosamente`);
+                handleCloseModal();
+            } else {
+                alert('Error al crear el usuario. Por favor, intente nuevamente.');
+            }
         } else if (editingUser) {
             const updatedUser: User = {
                 ...editingUser,
@@ -102,10 +109,15 @@ const UserManagement: React.FC = () => {
             if (form.password) {
                 updatedUser.password = form.password;
             }
-            saveUser(updatedUser);
+            const success = await saveUser(updatedUser);
+            
+            if (success) {
+                alert('Usuario actualizado exitosamente');
+                handleCloseModal();
+            } else {
+                alert('Error al actualizar el usuario. Por favor, intente nuevamente.');
+            }
         }
-        
-        handleCloseModal();
     };
     
     return (

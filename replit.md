@@ -126,6 +126,8 @@ npm run preview
     - Botón "+ Añadir Usuario" disponible
     - Configurar roles, permisos, ubicaciones al crear
     - Contraseña obligatoria al crear, opcional al editar
+    - Manejo de errores mejorado: muestra mensajes de éxito/error y solo cierra el modal si la operación fue exitosa
+    - Funciones async correctamente implementadas (createUser y saveUser retornan promesas)
 
 ## Recent Changes (Historical)
 - **2025-10-06**: Fixed Environment Variables for Production Deploy (COMPLETED ✅)

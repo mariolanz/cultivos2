@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode, useCallback, useMemo, useEffect } from 'react';
 import useSessionStorage from '../hooks/useSessionStorage';
-import { User, Crop, PlantBatch, Location, InventoryItem, Formula, FormulaSchedule, Genetics, Notification, Expense, UserRole, Task, Announcement, PlantBatchStatus, LogEntry, MaintenanceLog, MotherPlant, Equipment, TrimmingSession, PnoProcedure, Infographic } from '../types';
+import { User, Crop, PlantBatch, Location, InventoryItem, Formula, FormulaSchedule, Genetics, Notification, Expense, UserRole, Task, Announcement, PlantBatchStatus, LogEntry, MaintenanceLog, MotherPlant, Equipment, TrimmingSession, PnoProcedure, Infographic, AppPermission } from '../types';
 import * as D from '../constants';
 import { getStageInfo, getFormulaForWeek, getParentLocationId, getPnoParametersForWeek, isOutOfRange } from '../services/nutritionService';
 import * as authService from '../services/authService';
@@ -30,9 +30,16 @@ interface AuthContextType {
   simulatedUserId: string | null;
   login: (username: string, password: string) => Promise<User | null>;
   logout: () => void;
-  createUser: (user: Omit<User, 'id' | 'roles'>) => void;
+  createUser: (userData: {
+    username: string;
+    password: string;
+    roles: UserRole[];
+    locationId?: string;
+    maintenanceLocationIds?: string[];
+    permissions: { [key in AppPermission]?: boolean };
+  }) => Promise<User | null>;
   deleteUser: (userId: string) => void;
-  saveUser: (user: User) => void;
+  saveUser: (user: User) => Promise<boolean>;
   simulateUser: (userId: string | null) => void;
   activeRole: UserRole | null;
   setActiveRole: (role: UserRole | null) => void;
@@ -472,8 +479,20 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setActiveMotherPlantId(null);
   };
 
-  const createUser = (user: Omit<User, 'id' | 'roles'>) => {
-    console.log('createUser not yet implemented with Supabase');
+  const createUser = async (userData: {
+    username: string;
+    password: string;
+    roles: UserRole[];
+    locationId?: string;
+    maintenanceLocationIds?: string[];
+    permissions: { [key in AppPermission]?: boolean };
+  }): Promise<User | null> => {
+    const newUser = await authService.createUser(userData);
+    if (newUser) {
+      setUsers(prev => [...prev, newUser]);
+      return newUser;
+    }
+    return null;
   };
 
   const deleteUser = (userId: string) => {
@@ -492,7 +511,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     });
   };
 
-  const saveUser = async (user: User) => {
+  const saveUser = async (user: User): Promise<boolean> => {
     const success = await authService.updateUser(user.id, {
       id: user.id,
       username: user.username,
@@ -512,6 +531,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         return [...prev, user];
       });
     }
+    return success;
   };
 
   const createSaveFunction = <T extends { id: string }>(
