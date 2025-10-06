@@ -1,9 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { useCrops, useConfirmation, useAuth, usePlantBatches, useTasks, useGenetics, useLocations, useMotherPlants, useMaintenanceLogs } from '../context/AppProvider';
 import Card from './ui/Card';
-import { Crop, CropStage, UserRole, PlantBatch, PlantBatchStatus, Location, Task, SensorDataPoint, Genetics, MotherPlant } from '../types';
+import { Crop, CropStage, UserRole, PlantBatch, PlantBatchStatus, Location, Task, SensorDataPoint, Genetics, MotherPlant, STAGES } from '../types';
 import { getStageInfo, getPnoParametersForWeek, getRangeStatus } from '../services/nutritionService';
-import { STAGES } from '../constants';
 import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import MaintenanceDashboard from './MaintenanceDashboard';

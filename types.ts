@@ -52,6 +52,14 @@ export enum CropStage {
   HARVESTED = 'Cosechado',
 }
 
+export const STAGES = [
+  CropStage.CLONING,
+  CropStage.PRE_VEGETATION,
+  CropStage.VEGETATION,
+  CropStage.FLOWERING,
+  CropStage.DRYING_CURING,
+];
+
 export interface Crop {
   id: string;
   // name: string; // Removed as per user request
@@ -191,6 +199,18 @@ export type InventoryCategory =
   'Limpieza y Sanitización' |
   'Sustrato' |
   'Otro';
+
+export const INVENTORY_CATEGORIES: InventoryCategory[] = [
+  'Nutriente Base',
+  'Suplemento/Bioestimulante',
+  'Microorganismos/Biológicos',
+  'Control de Plagas/Enfermedades',
+  'Sustrato',
+  'Herramientas y Equipo',
+  'Refacciones',
+  'Limpieza y Sanitización',
+  'Otro'
+];
 
 export type InventoryType = 'Cultivo' | 'Mantenimiento';
 

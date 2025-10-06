@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode, useCallback, useMemo, useEffect } from 'react';
 import useSessionStorage from '../hooks/useSessionStorage';
 import { User, Crop, PlantBatch, Location, InventoryItem, Formula, FormulaSchedule, Genetics, Notification, Expense, UserRole, Task, Announcement, PlantBatchStatus, LogEntry, MaintenanceLog, MotherPlant, Equipment, TrimmingSession, PnoProcedure, Infographic, AppPermission } from '../types';
-import * as D from '../constants';
 import { getStageInfo, getFormulaForWeek, getParentLocationId, getPnoParametersForWeek, isOutOfRange } from '../services/nutritionService';
 import * as authService from '../services/authService';
 import { apiService } from '../services/apiService';

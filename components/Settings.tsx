@@ -2,8 +2,7 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import Card from './ui/Card';
 import { useAuth, useLocations, useGenetics, useConfirmation, useInventory, useFormulas, useTasks, useAppData, useEquipment } from '../context/AppProvider';
-import { UserRole, InventoryItem, User, Location, Genetics, Task, Formula, InventoryCategory, InventoryType, Equipment, APP_PERMISSIONS, AppPermission } from '../types';
-import { INVENTORY_CATEGORIES } from '../constants';
+import { UserRole, InventoryItem, User, Location, Genetics, Task, Formula, InventoryCategory, InventoryType, Equipment, APP_PERMISSIONS, AppPermission, INVENTORY_CATEGORIES } from '../types';
 
 const UserManagement: React.FC = () => {
     const { users, deleteUser, saveUser, currentUser, createUser } = useAuth();
