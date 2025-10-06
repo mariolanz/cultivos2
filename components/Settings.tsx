@@ -6,25 +6,29 @@ import { UserRole, InventoryItem, User, Location, Genetics, Task, Formula, Inven
 import { INVENTORY_CATEGORIES } from '../constants';
 
 const UserManagement: React.FC = () => {
-    const { users, deleteUser, saveUser, currentUser } = useAuth();
+    const { users, deleteUser, saveUser, currentUser, createUser } = useAuth();
     const { locations } = useLocations();
     const { showConfirmation } = useConfirmation();
     const [editingUser, setEditingUser] = useState<User | null>(null);
+    const [isCreatingUser, setIsCreatingUser] = useState(false);
 
-    const initialFormState = { roles: [] as UserRole[], locationId: '', maintenanceLocationIds: [] as string[], password: '', permissions: {} as User['permissions'] };
+    const initialFormState = { username: '', roles: [] as UserRole[], locationId: '', maintenanceLocationIds: [] as string[], password: '', permissions: {} as User['permissions'] };
     const [form, setForm] = useState(initialFormState);
 
     useEffect(() => {
         if (editingUser) {
             setForm({
+                username: editingUser.username,
                 roles: editingUser.roles,
                 locationId: editingUser.locationId || '',
                 maintenanceLocationIds: editingUser.maintenanceLocationIds || [],
                 password: '',
                 permissions: editingUser.permissions || {}
             });
+        } else if (isCreatingUser) {
+            setForm(initialFormState);
         }
-    }, [editingUser]);
+    }, [editingUser, isCreatingUser]);
 
     const parentLocations = useMemo(() => locations.filter(l => !l.parentId), [locations]);
 
@@ -60,29 +64,59 @@ const UserManagement: React.FC = () => {
         }));
     };
 
+    const handleOpenCreateModal = () => {
+        setIsCreatingUser(true);
+        setEditingUser(null);
+    };
+
+    const handleCloseModal = () => {
+        setIsCreatingUser(false);
+        setEditingUser(null);
+        setForm(initialFormState);
+    };
+
     const handleSaveUser = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!editingUser) return;
-
-        const updatedUser: User = {
-            ...editingUser,
-            roles: form.roles,
-            locationId: form.locationId || undefined,
-            maintenanceLocationIds: form.maintenanceLocationIds.length > 0 ? form.maintenanceLocationIds : undefined,
-            permissions: form.permissions,
-        };
-        if (form.password) {
-            updatedUser.password = form.password;
+        
+        if (isCreatingUser) {
+            if (!form.username || !form.password) {
+                alert('Usuario y contraseña son obligatorios');
+                return;
+            }
+            createUser({
+                username: form.username,
+                password: form.password,
+                roles: form.roles,
+                locationId: form.locationId || undefined,
+                maintenanceLocationIds: form.maintenanceLocationIds.length > 0 ? form.maintenanceLocationIds : undefined,
+                permissions: form.permissions,
+            });
+        } else if (editingUser) {
+            const updatedUser: User = {
+                ...editingUser,
+                roles: form.roles,
+                locationId: form.locationId || undefined,
+                maintenanceLocationIds: form.maintenanceLocationIds.length > 0 ? form.maintenanceLocationIds : undefined,
+                permissions: form.permissions,
+            };
+            if (form.password) {
+                updatedUser.password = form.password;
+            }
+            saveUser(updatedUser);
         }
-
-        saveUser(updatedUser);
-        setEditingUser(null);
+        
+        handleCloseModal();
     };
     
     return (
         <>
             <Card>
-                <h2 className="text-xl font-semibold text-primary mb-4">Gestión de Usuarios y Permisos</h2>
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-semibold text-primary">Gestión de Usuarios y Permisos</h2>
+                    <button onClick={handleOpenCreateModal} className="py-2 px-4 bg-primary hover:bg-primary-dark text-white font-bold rounded-md">
+                        + Añadir Usuario
+                    </button>
+                </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left text-text-secondary">
                         <thead className="text-xs text-text-secondary uppercase bg-gray-50">
@@ -101,7 +135,7 @@ const UserManagement: React.FC = () => {
                                     <td className="px-6 py-4">{locations.find(l => l.id === user.locationId)?.name || 'N/A'}</td>
                                     <td className="px-6 py-4">{user.maintenanceLocationIds?.join(', ') || 'N/A'}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <button onClick={() => setEditingUser(user)} className="text-primary hover:underline mr-4">Editar Permisos</button>
+                                        <button onClick={() => setEditingUser(user)} className="text-primary hover:underline mr-4">Editar</button>
                                         <button disabled={currentUser?.id === user.id} onClick={() => handleDelete(user.id, user.username)} className="text-red-500 hover:underline disabled:opacity-50 disabled:cursor-not-allowed">Eliminar</button>
                                     </td>
                                 </tr>
@@ -111,13 +145,28 @@ const UserManagement: React.FC = () => {
                 </div>
             </Card>
 
-            {editingUser && (
+            {(editingUser || isCreatingUser) && (
                 <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
                     <Card className="w-full max-w-2xl relative max-h-[90vh] flex flex-col">
-                        <button onClick={() => setEditingUser(null)} className="absolute top-2 right-2 text-text-secondary hover:text-text-primary text-2xl" aria-label="Cerrar">&times;</button>
-                        <h3 className="text-lg font-bold mb-4 text-text-primary">Editar Usuario: {editingUser.username}</h3>
+                        <button onClick={handleCloseModal} className="absolute top-2 right-2 text-text-secondary hover:text-text-primary text-2xl" aria-label="Cerrar">&times;</button>
+                        <h3 className="text-lg font-bold mb-4 text-text-primary">
+                            {isCreatingUser ? 'Crear Nuevo Usuario' : `Editar Usuario: ${editingUser?.username}`}
+                        </h3>
                         <form onSubmit={handleSaveUser} className="space-y-4 overflow-y-auto pr-2">
-                             <div>
+                            {isCreatingUser && (
+                                <div>
+                                    <label className="block text-sm font-medium text-text-secondary">Nombre de Usuario *</label>
+                                    <input 
+                                        type="text" 
+                                        value={form.username} 
+                                        onChange={e => setForm(p => ({...p, username: e.target.value}))} 
+                                        className="w-full mt-1 px-3 py-2 bg-gray-50 border border-border-color rounded-md" 
+                                        placeholder="Ej: JUAN"
+                                        required 
+                                    />
+                                </div>
+                            )}
+                            <div>
                                 <label className="block text-sm font-medium text-text-secondary">Roles</label>
                                 <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2">
                                 {Object.values(UserRole).map(role => (
@@ -168,12 +217,23 @@ const UserManagement: React.FC = () => {
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-text-secondary">Nueva Contraseña (opcional)</label>
-                                <input type="password" value={form.password} onChange={e => setForm(p => ({...p, password: e.target.value}))} className="w-full mt-1 px-3 py-2 bg-gray-50 border border-border-color rounded-md" placeholder="Dejar en blanco para no cambiar" />
+                                <label className="block text-sm font-medium text-text-secondary">
+                                    {isCreatingUser ? 'Contraseña *' : 'Nueva Contraseña (opcional)'}
+                                </label>
+                                <input 
+                                    type="password" 
+                                    value={form.password} 
+                                    onChange={e => setForm(p => ({...p, password: e.target.value}))} 
+                                    className="w-full mt-1 px-3 py-2 bg-gray-50 border border-border-color rounded-md" 
+                                    placeholder={isCreatingUser ? "Contraseña del usuario" : "Dejar en blanco para no cambiar"}
+                                    required={isCreatingUser}
+                                />
                             </div>
                             <div className="flex justify-end gap-2 pt-2">
-                                <button type="button" onClick={() => setEditingUser(null)} className="py-2 px-4 bg-gray-200 hover:bg-gray-300 text-text-primary rounded-md">Cancelar</button>
-                                <button type="submit" className="py-2 px-4 bg-primary hover:bg-primary-dark text-white font-bold rounded-md">Guardar Cambios</button>
+                                <button type="button" onClick={handleCloseModal} className="py-2 px-4 bg-gray-200 hover:bg-gray-300 text-text-primary rounded-md">Cancelar</button>
+                                <button type="submit" className="py-2 px-4 bg-primary hover:bg-primary-dark text-white font-bold rounded-md">
+                                    {isCreatingUser ? 'Crear Usuario' : 'Guardar Cambios'}
+                                </button>
                             </div>
                         </form>
                     </Card>

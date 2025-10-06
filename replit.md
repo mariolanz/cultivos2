@@ -109,7 +109,7 @@ npm run preview
 - **Run**: `serve -s dist -l 5000`
 
 ## Recent Changes
-- **2025-10-06**: Refactorización del Sistema de Autenticación y Base de Datos (EN PROGRESO)
+- **2025-10-06**: Refactorización del Sistema de Autenticación y Base de Datos (COMPLETADO ✅)
   - **Problema resuelto**: Eliminadas dependencias circulares entre usuarios y otras tablas
   - **Nuevo flujo de inicio**: Solo usuario ADMIN por defecto (usuario: ADMIN, password: admin123)
   - **AppProvider optimizado**: 
@@ -122,6 +122,10 @@ npm run preview
     - `update-rls-authenticated.sql`: RLS para usuarios autenticados
     - `remove-public-rls.sql`: Elimina acceso público a locations/genetics
   - **Admin total**: ADMIN tiene acceso completo sin depender de locations/genetics preexistentes
+  - **Gestión de Usuarios**: Admin puede crear nuevos usuarios desde "Ajustes y Gestión" → "Usuarios y Permisos"
+    - Botón "+ Añadir Usuario" disponible
+    - Configurar roles, permisos, ubicaciones al crear
+    - Contraseña obligatoria al crear, opcional al editar
 
 ## Recent Changes (Historical)
 - **2025-10-06**: Fixed Environment Variables for Production Deploy (COMPLETED ✅)
