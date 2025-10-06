@@ -1,10 +1,9 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Card from './ui/Card';
 import { useCrops, useFormulas, useInventory, useLocations, usePlantBatches, useAuth, useMotherPlants } from '../context/AppProvider';
-import { LogEntry, CropStage, Formula, PlantBatchStatus, Crop, PlantBatch, SensorDataPoint, MotherPlant, Location, UserRole, User, PnoWeekParameters } from '../types';
+import { LogEntry, CropStage, Formula, PlantBatchStatus, Crop, PlantBatch, SensorDataPoint, MotherPlant, Location, UserRole, User, PnoWeekParameters, PLANT_HEALTH_OPTIONS } from '../types';
 import { useNavigate } from 'react-router-dom';
 import { getStageInfo, getFormulaForWeek, getParentLocationId, getPnoParametersForWeek, isOutOfRange } from '../services/nutritionService';
-import { FOLIAR_PRODUCTS, SUPPLEMENT_PRODUCTS, PLANT_HEALTH_OPTIONS } from '../constants';
 import CameraModal from './ui/CameraModal';
 import { useDailyTasks } from '../hooks/useDailyTasks';
 
@@ -206,6 +205,27 @@ const Log: React.FC = () => {
   const navigate = useNavigate();
   const MAX_PHOTOS = 5;
   const topRef = useRef<HTMLDivElement>(null);
+
+  // Productos foliares y suplementos dinámicos desde inventario de Supabase
+  const FOLIAR_PRODUCTS = useMemo(() => {
+    const foliarCategories = ['Suplemento/Bioestimulante', 'Microorganismos/Biológicos', 'Control de Plagas/Enfermedades'];
+    return inventory
+      .filter(item => foliarCategories.includes(item.category))
+      .map(item => ({
+        name: item.name,
+        dose: item.unit === 'ml' ? '2.5 ml/L' : item.unit === 'g' ? '1 g/L' : '1 unidad/L'
+      }));
+  }, [inventory]);
+
+  const SUPPLEMENT_PRODUCTS = useMemo(() => {
+    const supplementCategories = ['Suplemento/Bioestimulante', 'Microorganismos/Biológicos'];
+    return inventory
+      .filter(item => supplementCategories.includes(item.category))
+      .map(item => ({
+        name: item.name,
+        dose: item.unit === 'ml' ? '2.5 ml/L' : item.unit === 'g' ? '1 g/L' : '1 unidad/L'
+      }));
+  }, [inventory]);
   const sensorFileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFileName, setSelectedFileName] = useState<string>('');
 

@@ -380,3 +380,70 @@ export interface Infographic {
         style: string;
     };
 }
+
+// Configuración de lámparas por sala (mapeo por nombre de sala)
+export const ROOM_LAMP_CONFIG: { [roomName: string]: number } = {
+  'BR1': 14,
+  'BR2': 14,
+  'BR3': 4,
+  'BR4': 6,
+  'BR5': 6,
+  'LL1': 8,
+  'LL2': 8,
+  'LL3': 8,
+  'SS1': 16,
+  'SS2': 16,
+  'MC1': 16,
+  'MC2': 8,
+  'MC3': 8,
+  'MC4': 8,
+  'MC5': 4,
+};
+
+// Opciones de salud de plantas (UI estática)
+export const PLANT_HEALTH_OPTIONS: { [category: string]: string[] } = {
+  'Estado Positivo': [
+    'Crecimiento vigoroso',
+    'Color verde intenso',
+    'Sin signos de estrés',
+    'Producción de resina alta',
+    'Desarrollo de flores denso',
+    'Sistema radicular sano',
+  ],
+  'Plagas Comunes': [
+    'Araña roja',
+    'Mosca blanca',
+    'Trips',
+    'Pulgones',
+    'Cochinilla',
+    'Minadores de hojas',
+    'Orugas',
+  ],
+  'Enfermedades y Hongos': [
+    'Oídio',
+    'Mildiu',
+    'Botrytis (Moho gris)',
+    'Pythium (Pudrición de raíz)',
+    'Fusarium',
+    'Roya',
+    'Septoria',
+  ],
+  'Deficiencias Nutricionales': [
+    'Deficiencia de Nitrógeno (N)',
+    'Deficiencia de Fósforo (P)',
+    'Deficiencia de Potasio (K)',
+    'Deficiencia de Calcio (Ca)',
+    'Deficiencia de Magnesio (Mg)',
+    'Deficiencia de Hierro (Fe)',
+    'Deficiencia de Zinc (Zn)',
+  ],
+  'Problemas Ambientales': [
+    'Estrés por calor',
+    'Estrés por frío',
+    'Exceso de riego',
+    'Falta de riego',
+    'Quemadura por luz (Luz excesiva)',
+    'Baja humedad',
+    'Alta humedad',
+  ],
+};

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useCrops, useGenetics, usePlantBatches, useLocations } from '../context/AppProvider';
-import { ROOM_LAMP_CONFIG } from '../constants';
+import { ROOM_LAMP_CONFIG } from '../types';
 import Card from './ui/Card';
 
 const POUND_TO_GRAMS = 453.592;
@@ -94,13 +94,14 @@ const HarvestProjection: React.FC = () => {
                     };
                 });
                 
-                const lampCount = ROOM_LAMP_CONFIG[crop.locationId] || 0;
+                const roomName = locations.find(l => l.id === crop.locationId)?.name || '';
+                const lampCount = ROOM_LAMP_CONFIG[roomName] || 0;
                 const estimatedYieldLbs = lampCount * lbsPerLamp;
                 const estimatedYieldGrams = estimatedYieldLbs * POUND_TO_GRAMS;
                 
                 calculatedProjections.push({
                     cropId: crop.id,
-                    cropName: locations.find(l => l.id === crop.locationId)?.name || crop.id,
+                    cropName: roomName || crop.id,
                     availabilityDate, isEstimate, geneticsBreakdown, estimatedYieldLbs, estimatedYieldGrams,
                 });
             }
