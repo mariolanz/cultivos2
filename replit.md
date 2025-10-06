@@ -128,6 +128,13 @@ npm run preview
     - Contraseña obligatoria al crear, opcional al editar
     - Manejo de errores mejorado: muestra mensajes de éxito/error y solo cierra el modal si la operación fue exitosa
     - Funciones async correctamente implementadas (createUser y saveUser retornan promesas)
+  - **Backend API para Operaciones Administrativas**:
+    - Creado servidor Express en `api/server.js` (puerto 3001)
+    - Endpoints seguros para crear, editar y eliminar usuarios
+    - Usa `SUPABASE_SERVICE_ROLE_KEY` de forma segura (solo en backend)
+    - Valida permisos de administrador antes de ejecutar operaciones
+    - Frontend actualizado para usar `services/apiService.ts`
+    - Separación clara: frontend usa ANON_KEY (lectura), backend usa SERVICE_ROLE_KEY (escritura)
 
 ## Recent Changes (Historical)
 - **2025-10-06**: Fixed Environment Variables for Production Deploy (COMPLETED ✅)
