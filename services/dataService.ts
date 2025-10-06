@@ -243,8 +243,7 @@ export async function fetchAll<T>(tableName: TableName): Promise<T[]> {
   try {
     const { data, error } = await supabase
       .from(tableName)
-      .select('*')
-      .order('created_at', { ascending: false });
+      .select('*');
 
     if (error) {
       console.error(`Error fetching ${tableName}:`, error);
@@ -311,7 +310,6 @@ export async function update<T extends { id: string }>(
   try {
     const dbUpdates = mapKeysToDb(updates, tableName);
     delete dbUpdates.id;
-    dbUpdates.updated_at = new Date().toISOString();
 
     const { data, error } = await supabase
       .from(tableName)
@@ -338,7 +336,6 @@ export async function upsert<T extends { id: string }>(
 ): Promise<T | null> {
   try {
     const dbItem = mapKeysToDb(item, tableName);
-    dbItem.updated_at = new Date().toISOString();
 
     const { data, error } = await supabase
       .from(tableName)
