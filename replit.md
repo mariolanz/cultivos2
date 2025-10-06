@@ -105,6 +105,14 @@ npm run preview
 - **Run**: `serve -s dist -l 5000`
 
 ## Recent Changes
+- **2025-10-06**: Frontend Integration with Supabase (COMPLETED ✅)
+  - Creado `services/dataService.ts` con operaciones CRUD completas para todas las entidades
+  - AppProvider ahora carga datos de Supabase al inicio de la sesión
+  - Todas las operaciones de guardado (save) ahora persisten en Supabase
+  - Login usa autenticación bcrypt async desde Supabase
+  - **IMPORTANTE**: La app ya NO usa localStorage - todos los datos están en Supabase
+  - Archivo backup: `context/AppProvider.localStorage.tsx` (versión anterior con localStorage)
+
 - **2025-10-05**: Data Migration to Supabase (COMPLETED ✅)
   - Successfully migrated all example data from constants.ts to Supabase
   - **Migrated data:**
