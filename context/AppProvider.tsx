@@ -337,6 +337,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     async function loadData() {
       try {
         setIsLoading(true);
+        console.log('🔄 Iniciando carga de datos desde Supabase...');
+        
         const [
           geneticsData,
           locationsData,
@@ -356,23 +358,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           notificationsData,
           announcementsData
         ] = await Promise.all([
-          geneticsService.getAll(),
-          locationsService.getAll(),
-          tasksService.getAll(),
-          inventoryService.getAll(),
-          formulasService.getAll(),
-          equipmentService.getAll(),
-          expensesService.getAll(),
-          pnoProceduresService.getAll(),
-          infographicsService.getAll(),
-          authService.getAllUsers(),
-          motherPlantsService.getAll(),
-          cropsService.getAll(),
-          plantBatchesService.getAll(),
-          trimmingSessionsService.getAll(),
-          maintenanceLogsService.getAll(),
-          notificationsService.getAll(),
-          announcementsService.getAll()
+          geneticsService.getAll().catch(e => { console.error('❌ Error cargando genetics:', e); return []; }),
+          locationsService.getAll().catch(e => { console.error('❌ Error cargando locations:', e); return []; }),
+          tasksService.getAll().catch(e => { console.error('❌ Error cargando tasks:', e); return []; }),
+          inventoryService.getAll().catch(e => { console.error('❌ Error cargando inventory:', e); return []; }),
+          formulasService.getAll().catch(e => { console.error('❌ Error cargando formulas:', e); return []; }),
+          equipmentService.getAll().catch(e => { console.error('❌ Error cargando equipment:', e); return []; }),
+          expensesService.getAll().catch(e => { console.error('❌ Error cargando expenses:', e); return []; }),
+          pnoProceduresService.getAll().catch(e => { console.error('❌ Error cargando PNO:', e); return []; }),
+          infographicsService.getAll().catch(e => { console.error('❌ Error cargando infographics:', e); return []; }),
+          authService.getAllUsers().catch(e => { console.error('❌ Error cargando users:', e); return []; }),
+          motherPlantsService.getAll().catch(e => { console.error('❌ Error cargando mother plants:', e); return []; }),
+          cropsService.getAll().catch(e => { console.error('❌ Error cargando crops:', e); return []; }),
+          plantBatchesService.getAll().catch(e => { console.error('❌ Error cargando batches:', e); return []; }),
+          trimmingSessionsService.getAll().catch(e => { console.error('❌ Error cargando trimming:', e); return []; }),
+          maintenanceLogsService.getAll().catch(e => { console.error('❌ Error cargando maintenance:', e); return []; }),
+          notificationsService.getAll().catch(e => { console.error('❌ Error cargando notifications:', e); return []; }),
+          announcementsService.getAll().catch(e => { console.error('❌ Error cargando announcements:', e); return []; })
         ]);
 
         setGenetics(geneticsData as Genetics[]);
@@ -393,8 +395,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setNotifications(notificationsData as Notification[]);
         setAnnouncements(announcementsData as Announcement[]);
         
+        console.log('✅ Carga de datos completada');
       } catch (error) {
-        console.error('Error loading data from Supabase:', error);
+        console.error('❌ Error general loading data from Supabase:', error);
       } finally {
         setIsLoading(false);
       }
