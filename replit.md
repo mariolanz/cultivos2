@@ -97,6 +97,10 @@ npm run preview
 - Multi-stage build for optimized production image
 - Uses `serve` package to serve production build
 - Port 5000 exposed for consistency
+- Accepts build arguments (ARG) for Vite environment variables:
+  - VITE_SUPABASE_URL
+  - VITE_SUPABASE_ANON_KEY
+  - VITE_GEMINI_API_KEY
 - Optimized for EasyPanel deployment
 
 ### Deployment
