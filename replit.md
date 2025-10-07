@@ -35,7 +35,7 @@ This is a comprehensive cannabis cultivation management application built with R
 ### System Design Choices
 - **Deployment**: Configured for Replit and EasyPanel deployment with separate Dockerfiles for frontend (`Dockerfile.frontend`) and backend (`Dockerfile.backend`).
 - **Environment Variables**: Uses `import.meta.env` for client-side variables (Vite standard) and `.env` for mapping Replit secrets. Environment variables for deployment must have the `VITE_` prefix.
-- **Database Setup**: Requires execution of specific SQL scripts (`setup-database-complete.sql`, `seed-clean-start.sql`, `seed-users-with-locations.sql`) in a specific order for both development and production.
+- **Database Setup**: Requires execution of specific SQL scripts (`setup-database-complete.sql`, `enable-rls-policies.sql`, `seed-clean-start.sql`, `seed-users-with-locations.sql`) in a specific order for both development and production. **CRITICAL:** `enable-rls-policies.sql` must be executed in production or all endpoints will fail with 400 errors.
 
 ## External Dependencies
 - **AI Integration**: Google Gemini AI (@google/genai 1.20.0) - Requires `GEMINI_API_KEY`.
