@@ -3,7 +3,7 @@
 ## Overview
 This is a comprehensive cannabis cultivation management application built with React, TypeScript, and Vite. The app provides tools for managing cultivation batches, tracking environmental conditions, scheduling tasks, and using AI-powered diagnostics for plant health assessment and harvest predictions.
 
-**Last Updated:** October 5, 2025
+**Last Updated:** October 6, 2025
 
 ## Key Features
 - **Dashboard**: Real-time monitoring of cultivation metrics
@@ -129,6 +129,25 @@ La aplicación usa **dos Dockerfiles separados** para deployment:
 - Puerto: 3001
 
 ## Recent Changes
+- **2025-10-06**: Migración Completa de constants.ts a Supabase (COMPLETADO ✅)
+  - **Objetivo cumplido**: Toda la información de constants.ts ahora se gestiona desde Supabase
+  - **Script SQL ejecutado**: `seed-clean-start.sql` insertó 30 genéticas, 24 locations, 52 nutrientes
+  - **AppProvider 100% Supabase**: Eliminado import de constants.ts, carga TODO desde dataService
+  - **Componentes refactorizados**:
+    - `Log.tsx`: Productos foliares/suplementos ahora dinámicos desde inventory (filtrados por categoría)
+    - `HarvestProjection.tsx`: Config de lámparas usa nombres de sala compatibles con UUIDs
+    - `Dashboard.tsx`: Importa STAGES desde types.ts
+    - `Settings.tsx`: Importa INVENTORY_CATEGORIES desde types.ts
+  - **types.ts centralizado**: Nuevas constantes estáticas agregadas:
+    - INVENTORY_CATEGORIES (categorías de inventario)
+    - STAGES (array de CropStage)
+    - PLANT_HEALTH_OPTIONS (opciones de salud de plantas para UI)
+    - ROOM_LAMP_CONFIG (configuración de lámparas por nombre de sala)
+  - **Archivos con constants.ts (justificados)**:
+    - `nutritionService.ts`: PNO_PARAMETERS (parámetros técnicos estáticos, correcto)
+    - `AppProvider.localStorage.tsx`: Backup, ignorar
+  - **Gestión de datos**: Settings tiene CRUD completo de inventario/nutrientes
+
 - **2025-10-06**: Refactorización del Sistema de Autenticación y Base de Datos (COMPLETADO ✅)
   - **Problema resuelto**: Eliminadas dependencias circulares entre usuarios y otras tablas
   - **Nuevo flujo de inicio**: Solo usuario ADMIN por defecto (usuario: ADMIN, password: admin123)
